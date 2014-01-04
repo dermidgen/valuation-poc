@@ -1,39 +1,115 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
 <head>
 	<title>Property Valuation</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href='lib/bootstrap/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=News+Cycle:400,700|Cabin+Condensed:400,700|Montserrat:400,700' rel='stylesheet' type='text/css'>
 	<style>
 
-	div.menu { padding: 2em; background-color: rgba(255,255,255,0.8); width: 35em; margin: 8em auto; border-radius: 1em; border: 5px solid #fff;}
+	body { 
+		/*background-image: url(http://farm4.staticflickr.com/3779/11754673356_f8f6c7c5cb_b.jpg); */
+		background-attachment: fixed; background-position: 50% 50%; background-repeat: no-repeat no-repeat;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+	}
 
-	#result { display:none; margin-top: 2em; padding: 0.8em; background: #fff; border-radius: 1em; }
+	html,body { font-family: 'Montserrat', sans-serif; height: 100%; }
+	h1 { font-family: 'Cabin Condensed', sans-serif; margin:0; }
+	h2 { font-family: 'News Cycle', sans-serif; margin: 0.1em 0 0.8em 0; }
+
+	#map-canvas {
+		height: 100%;
+		position: fixed;
+		z-index:0;
+	}
+	#wrap { min-height: 100%; }
+	#main { overflow:auto; padding-bottom: 60px; }
+	.footer { 
+		font-size: 0.8em;
+		position: relative;
+		margin-top: -60px;
+		height: 60px;
+		clear: both;
+		padding-top: 8px;
+		background-color: rgba(255,255,255,0.9); 
+		border-top: 5px solid #fff;		
+	}
+
+	#querywin, #result { 
+		padding: 2em; 
+		background-color: rgba(255,255,255,0.9); 
+		margin: 8em 0 0 0; 
+		border: 5px solid #fff;		
+	}
+	#result { display:none; margin: 2em 0; }
 
 	</style>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 </head>
 <body>
-	<div class="menu">
-		<div>
-			<h1>Property Valuation</h1>
+	<div id="map-canvas"></div>
+	<div id="wrap">
+		<div id="main" class="container clear-top">
+
+			<div id="querywin">
+				<form role="form">
+					<h1>What is your home worth?</h1>
+					<h2>Get a free estimate of the value of your home</h2>
+
+					<div class="row">
+						<div class="col-md-8">
+							<label class="sr-only" for="address">Enter your address</label>
+							<input type="text" name="address" id="address" placeholder="Enter your address" class="form-control"/>
+						</div>
+						<div class="col-md-3">
+							<button type="button" class="btn btn-primary" onclick="fetchProperty()">Get Valuation</button>
+						</div>
+					</div>
+				</form>
+			</div>
+			<pre id="result"></pre>
+
 		</div>
-		<div>
-			<input type="text" name="address" id="address" placeholder="Enter your address" size="60"/>
-			<button onclick="fetchProperty()">Get Valuation</button>
-		</div>
-		<pre id="result"></pre>
 	</div>
 
-	<script language="javascript">
+
+	<footer class="footer">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-2"><img src="http://www.zillow.com/widgets/GetVersionedResource.htm?path=/static/logos/Zillowlogo_150x40.gif" width="150" height="40" alt="Zillow Real Estate Search" /></div>
+				<div class="col-md-8">
+						Listing results: &copy; Zillow, Inc., 2006-2013. Use is subject to <a href="http://www.zillow.com/corp/Terms.htm" target="_blank">Terms of Use</a> <br> <a href="http://www.zillow.com/wikipages/What-is-a-Zestimate/" target="_blank">What's a Zestimate?</a>
+				</div>
+				<div class="col-md-4"></div>
+			</div>
+		</div>
+	</footer>
+
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c&sensor=true"></script>
+<script language="javascript">
+
+	var gkey = 'AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c';
 
 	// var uri = "http://api.flickr.com/services/feeds/photos_public.gne?tags=house,street,yard&format=json&lang=en-us&jsoncallback=?";
-
 	var uri = "http://api.flickr.com/services/feeds/groups_pool.gne?id=92575895@N00&format=json&lang=en-us&jsoncallback=?";
 
-	var showPhoto = function(data) {
+	function initialize() {
+		var mapOptions = {
+			center: new google.maps.LatLng(-34.397, 150.644),
+			zoom: 8
+		};
+		var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
+	}
+
+	var setBG = function(data) {
 		var l = data.items.length;
 		var i = Math.floor((Math.random()*l)+1);
 		if (data.items[i]) {
-			$('body').css('background','url('+data.items[i].media.m.replace('_m','_b')+')');
+			$('body')[0].style.backgroundImage = 'url('+data.items[i].media.m.replace('_m','_b')+')';
 		}
 	};
 
@@ -48,6 +124,8 @@
 
 			$('#result').show();
 			$('#result').html(JSON.stringify(result, undefined, 2));
+
+      		google.maps.event.addDomListener(window, 'load', initialize);
 		});
 	};
 
@@ -57,7 +135,7 @@
 			url: uri,
 			dataType: "jsonp",
 			crossDomain: "true",
-			jsonpCallback: 'showPhoto'
+			jsonpCallback: 'setBG'
 		});
 
 	});
