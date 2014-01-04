@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Property Valuation</title>
+	<style>
+
+	div.menu { padding: 2em; background-color: rgba(255,255,255,0.7); width: 35em; margin: 8em auto; border-radius: 0.3em }
+
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+	<div class="menu">
+		<div>
+			<h1>Property Valuation</h1>
+		</div>
+		<div>
+			<input type="text" name="address" id="address" placeholder="Enter your address" size="60"/>
+			<button onclick="fetchProperty()">Get Valuation</button>
+		</div>
+	</div>
+
+	<script language="javascript">
+	var zwid = 'X1-ZWz1dp4jgzyih7_axb7v';
+	// var uri = "http://api.flickr.com/services/feeds/photos_public.gne?tags=house,street,yard&format=json&lang=en-us&jsoncallback=?";
+	var uri = "http://api.flickr.com/services/feeds/groups_pool.gne?id=92575895@N00&format=json&lang=en-us&jsoncallback=?";
+	var showPhoto = function(data) {
+		var l = data.items.length;
+		var i = Math.floor((Math.random()*l)+1);
+		if (data.items[i]) {
+			$('body').css('background','url('+data.items[i].media.m.replace('_m','_b')+')');
+		}
+	};
+
+	var fetchPropertyInfo = function(data)
+	{
+		console.log(data);
+	};
+
+	var fetchProperty = function() {
+		var address = $('#address').val();
+		var zip = '92675';
+		var uri = "http://www.zillow.com/webservice/GetSearchResults.htm?zws-id="+zwid+
+					"&address="+address+"&citystatezip="+zip;
+
+		$.get(uri, function(data) { console.log(data); });
+	};
+
+	$.ajax({
+		url: uri,
+		dataType: "jsonp",
+		crossDomain: "true",
+		jsonpCallback: 'showPhoto'
+	});
+
+	$(document).ready(function(){
+	});
+	</script>
+</body>
+</html>
