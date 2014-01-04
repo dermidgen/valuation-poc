@@ -1,6 +1,7 @@
 var http    = require('http'),
     express = require('express'),
-    app     = express();
+    app     = express(),
+    libxmljs= require('libxmljs');
 
 var zwid = 'X1-ZWz1dp4jgzyih7_axb7v';
 
@@ -20,7 +21,7 @@ app.configure(function() {
 
 });
 
-app.get('/propertySearch', function(req, res) {
+app.get('/propertySearch', function(req, client) {
 	var ec = encodeURIComponent;
 	var q = "?zws-id="+ec(zwid)+"&address="+ec(req.query.address)+
 								"&citystatezip="+ec(req.query.citystatezip);
@@ -41,12 +42,19 @@ app.get('/propertySearch', function(req, res) {
 	  }).on('end', function() {
 	    var body = Buffer.concat(bodyChunks);
 	    console.log('BODY: ' + body);
+
+	    var xmlDoc = libxmljs.parseXml(body);
+	    var out = JSON.stringify(xmlDoc);
+
+	    client.status(200).set('Content-Type', 'text/html').send(out);
+
 	    // ...and/or process the entire body here.
 	  })
 	});
 
 	req.on('error', function(e) {
 	  console.log('ERROR: ' + e.message);
+	  client.status(200).set('Content-Type', 'text/html').send('fail');
 	});
 });
 
