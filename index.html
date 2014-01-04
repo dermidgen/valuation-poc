@@ -40,7 +40,7 @@
 		var uri = "/propertySearch?&address="+address+"&citystatezip="+zip;
 
 		$.get(uri, function(data) {
-			var record = data["SearchResults:searchresults"].results.result; 
+			var record = data[0]; 
 			console.log(record); 
 		});
 	};
