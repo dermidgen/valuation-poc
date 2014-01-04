@@ -31,7 +31,7 @@ app.get('/propertySearch', function(req, res) {
 
 	http.get(uri, function(res) {
 		console.log("Got response: " + res.statusCode);
-		console.log(res);
+		console.log(res.data);
 	}).on('error', function(e) {
 		console.log("Got error: " + e.message);
 	});
