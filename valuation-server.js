@@ -42,7 +42,7 @@ app.get('/propertySearch', function(req, client) {
 	    var body = Buffer.concat(bodyChunks);
 	    // console.log('BODY: ' + body);
 
-		parser.parseString(data, function (err, result) {
+		parser.parseString(body, function (err, result) {
 		    console.dir(result);
 		    client.status(200).set('Content-Type', 'text/html').send(result);
 		    console.log('Done');
