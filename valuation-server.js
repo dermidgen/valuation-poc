@@ -22,20 +22,32 @@ app.configure(function() {
 
 app.get('/propertySearch', function(req, res) {
 	var ec = encodeURIComponent;
-	var uri = "http://www.zillow.com/webservice/GetSearchResults.htm";
 	var q = "?zws-id="+ec(zwid)+"&address="+ec(req.query.address)+
 								"&citystatezip="+ec(req.query.citystatezip);
+	var options = {
+	  host: 'www.zillow.com',
+	  path: '/webservice/GetSearchResults.htm' + q
+	};
 
-	var url = uri + q
-	console.log(url);
+	var req = http.get(options, function(res) {
+	  console.log('STATUS: ' + res.statusCode);
+	  console.log('HEADERS: ' + JSON.stringify(res.headers));
 
-	http.get(uri, function(res) {
-		console.log("Got response: " + res.statusCode);
-		console.log(res.data);
-	}).on('error', function(e) {
-		console.log("Got error: " + e.message);
+	  // Buffer the body entirely for processing as a whole.
+	  var bodyChunks = [];
+	  res.on('data', function(chunk) {
+	    // You can process streamed parts here...
+	    bodyChunks.push(chunk);
+	  }).on('end', function() {
+	    var body = Buffer.concat(bodyChunks);
+	    console.log('BODY: ' + body);
+	    // ...and/or process the entire body here.
+	  })
 	});
 
+	req.on('error', function(e) {
+	  console.log('ERROR: ' + e.message);
+	});
 });
 
 app.get('/propertyDetail', function(req, res) {
