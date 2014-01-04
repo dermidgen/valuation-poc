@@ -6,7 +6,7 @@
 
 	div.menu { padding: 2em; background-color: rgba(255,255,255,0.8); width: 35em; margin: 8em auto; border-radius: 1em; border: 5px solid #fff;}
 
-	#result { display:none; }
+	#result { display:none; margin-top: 2em; padding: 0.8em; background: #fff; border-radius: 1em; }
 
 	</style>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -20,7 +20,7 @@
 			<input type="text" name="address" id="address" placeholder="Enter your address" size="60"/>
 			<button onclick="fetchProperty()">Get Valuation</button>
 		</div>
-		<div id="result"></div>
+		<pre id="result"></pre>
 	</div>
 
 	<script language="javascript">
