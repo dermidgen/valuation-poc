@@ -26,7 +26,7 @@ app.get('/propertySearch', function(req, res) {
 
 	console.log(uri);
 
-	http.get(uri, function(res){
+	http.get(encodeURIComponent(uri), function(res){
 		console.log(res);
 	    res.status(200).set('Content-Type', 'text/html').send('ok');
 	});
@@ -35,7 +35,7 @@ app.get('/propertySearch', function(req, res) {
 app.get('/propertyDetail', function(req, res) {
 	var uri = "http://www.zillow.com/webservice/GetZestimate.htm?zws-id="+zwid+"&zpid="+req.query.zpid;
 
-	http.get(uri, function(res){
+	http.get(encodeURIComponent(uri), function(res){
 		console.log(res);
 	    res.status(200).set('Content-Type', 'text/html').send('ok');
 	});
