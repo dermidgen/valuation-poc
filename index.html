@@ -21,9 +21,11 @@
 	</div>
 
 	<script language="javascript">
-	var zwid = 'X1-ZWz1dp4jgzyih7_axb7v';
+
 	// var uri = "http://api.flickr.com/services/feeds/photos_public.gne?tags=house,street,yard&format=json&lang=en-us&jsoncallback=?";
+
 	var uri = "http://api.flickr.com/services/feeds/groups_pool.gne?id=92575895@N00&format=json&lang=en-us&jsoncallback=?";
+
 	var showPhoto = function(data) {
 		var l = data.items.length;
 		var i = Math.floor((Math.random()*l)+1);
@@ -40,20 +42,20 @@
 	var fetchProperty = function() {
 		var address = $('#address').val();
 		var zip = '92675';
-		var uri = "http://www.zillow.com/webservice/GetSearchResults.htm?zws-id="+zwid+
-					"&address="+address+"&citystatezip="+zip;
+		var uri = "/propertySearch?&address="+address+"&citystatezip="+zip;
 
 		$.get(uri, function(data) { console.log(data); });
 	};
 
-	$.ajax({
-		url: uri,
-		dataType: "jsonp",
-		crossDomain: "true",
-		jsonpCallback: 'showPhoto'
-	});
-
 	$(document).ready(function(){
+
+		$.ajax({
+			url: uri,
+			dataType: "jsonp",
+			crossDomain: "true",
+			jsonpCallback: 'showPhoto'
+		});
+
 	});
 	</script>
 </body>
