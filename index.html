@@ -60,7 +60,7 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 </head>
 <body>
-	<div id="map-canvas"></div>
+	<!-- <div id="map-canvas"></div> -->
 	<div id="wrap">
 		<div id="main" class="container clear-top">
 
@@ -85,7 +85,29 @@
 					</div>
 				</form>
 			</div>
-			<pre id="result"></pre>
+
+			<div id="result">
+
+				<div class="row">
+					<div class="col-md-4">
+						<input value="true" id="skinnyCalc" type="hidden"></input>
+						<input value="736c5f" id="skinnyCalcTc" type="hidden"></input>
+						<input value="f7f5f4" id="skinnyCalcBgc" type="hidden"></input>
+
+						<div>
+							<div class="title">Home Value Estimate</div>
+							<div id="zillow-shv-js-large-widget1388867792035"></div>
+							<!-- <div id="footer-links-container" style="height:auto;padding-bottom:5px;margin:5px 5px 0;text-align:center;">
+								<div style="height:auto;display:block;overflow:hidden;"><a href="http://www.zillow.com/san-juan-capistrano-ca/" target="_blank" style="font-size:11px;padding:0;width:285px;color:#736c5f;text-decoration:none;" scen="s1"><span class="region">San Juan Capistrano</span> on Zillow</a></div>
+							</div> -->
+						</div>
+					</div>
+					<div class="col-md-8">
+						<div id="map-canvas"></div>
+					</div>
+				</div>
+
+			</div>
 
 		</div>
 	</div>
@@ -103,21 +125,34 @@
 		</div>
 	</footer>
 
-
-<!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c&sensor=true"></script>-->
-<script language="javascript">
+<script type="text/javascript" src="http://www.zillow.com/widgets/GetVersionedResource.htm?path=/static/js/src/zillow/widgets/zestimate-js-widget-concat.js"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c&sensor=true"></script>
+<script type="text/javascript" language="javascript">
 
 	var gkey = 'AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c';
 
 	// var uri = "http://api.flickr.com/services/feeds/photos_public.gne?tags=house,street,yard&format=json&lang=en-us&jsoncallback=?";
 	var uri = "http://api.flickr.com/services/feeds/groups_pool.gne?id=92575895@N00&format=json&lang=en-us&jsoncallback=?";
 
+	function showWidgets(address, region) {
+		if (window.YAHOO && window.YAHOO.zillowwidgets) {
+			var uri = 'http://www.zillow.com/widgets/zestimate/ZestimateLargeWidget.htm?did=zillow-shv-js-large-widget1388867792035&type=js&address='+address+'&skinnyWidget=true&tc=736c5f&bgc=f7f5f4&searchbox=no&region='+region+'&callback=YAHOO.zillowwidgets.zestimatewidget.js.launcher';
+
+			console.log(uri);
+
+			YAHOO.zillowwidgets.$G.script(uri);
+		} else { 
+			 document.getElementById('zillow-shv-js-large-widget1388867792035').innerHTML = '<div style="border:1px solid #adcfff;font-size:12px;color:#555;">We\'ll be back online as soon as possible, but for updates, please check the <a style="font:normal normal normal 12px verdana,arial,sans-serif;color:#3366bb;text-decoration:underline;" href="http://www.zillow.com/blog/" target="_blank">Zillow Blog</a></div>';
+		} 
+
+	}
+
 	function initialize() {
 		var mapOptions = {
 			center: new google.maps.LatLng(-34.397, 150.644),
 			zoom: 8
 		};
-		// var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
+		var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
 	}
 
 	var setBG = function(data) {
@@ -131,14 +166,24 @@
 	var fetchProperty = function() {
 		var address = $('#address').val().split(',');
 
-		var uri = "/propertySearch?&address="+address[0]+"&citystatezip="+address[1];
+		var uri = "/propertySearch?&address="+address.shift()+"&citystatezip="+address.join(',');
 
 		$.get(uri, function(data) {
 			var record = JSON.parse(data); 
 			var result = record["SearchResults:searchresults"].response[0].results[0].result[0];
 
+			var street = result.address[0].street[0];
+			var city = result.address[0].city[0];
+			var state = result.address[0].state[0]
+			var zip = result.address[0].zipcode[0];
+
+			var widgetAddress = encodeURIComponent(street + ',' + zip);
+			var widgetRegion = encodeURIComponent(city);
+
 			$('#result').show();
-			$('#result').html(JSON.stringify(result, undefined, 2));
+			showWidgets(widgetAddress, widgetRegion);
+			initialize();
+			// $('#result').html(JSON.stringify(result, undefined, 2));
 
       		// google.maps.event.addDomListener(window, 'load', initialize);
 		});
