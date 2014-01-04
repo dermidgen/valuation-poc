@@ -41,7 +41,7 @@
 
 		$.get(uri, function(data) {
 			var record = JSON.parse(data); 
-			console.log(record[0],record["SearchResults:searchresults"]); 
+			console.log(record["SearchResults:searchresults"].response[0].results[0].result[0]); 
 		});
 	};
 
