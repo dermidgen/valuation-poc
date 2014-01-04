@@ -24,6 +24,8 @@ app.get('/propertySearch', function(req, res) {
 	var uri = "http://www.zillow.com/webservice/GetSearchResults.htm?zws-id="+zwid+
 			"&address="+req.query.address+"&citystatezip="+req.query.citystatezip;
 
+	console.log(uri);
+
 	http.get(uri, function(res){
 		console.log(res);
 	    res.status(200).set('Content-Type', 'text/html').send('ok');
