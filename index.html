@@ -34,17 +34,15 @@
 		}
 	};
 
-	var fetchPropertyInfo = function(data)
-	{
-		console.log(data);
-	};
-
 	var fetchProperty = function() {
 		var address = $('#address').val();
 		var zip = '92675';
 		var uri = "/propertySearch?&address="+address+"&citystatezip="+zip;
 
-		$.get(uri, function(data) { console.log(data); });
+		$.get(uri, function(data) {
+			var record = data["SearchResults:searchresults"].results.result; 
+			console.log(record); 
+		});
 	};
 
 	$(document).ready(function(){
