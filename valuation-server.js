@@ -31,8 +31,8 @@ app.get('/propertySearch', function(req, client) {
 	};
 
 	var req = http.get(options, function(res) {
-	  console.log('STATUS: ' + res.statusCode);
-	  console.log('HEADERS: ' + JSON.stringify(res.headers));
+	  // console.log('STATUS: ' + res.statusCode);
+	  // console.log('HEADERS: ' + JSON.stringify(res.headers));
 
 	  // Buffer the body entirely for processing as a whole.
 	  var bodyChunks = [];
@@ -41,11 +41,12 @@ app.get('/propertySearch', function(req, client) {
 	    bodyChunks.push(chunk);
 	  }).on('end', function() {
 	    var body = Buffer.concat(bodyChunks);
-	    console.log('BODY: ' + body);
+	    // console.log('BODY: ' + body);
 
 	    var xmlDoc = libxmljs.parseXml(body);
 	    var out = JSON.stringify(xmlDoc);
 
+	    console.log(out);
 	    client.status(200).set('Content-Type', 'text/html').send(out);
 
 	    // ...and/or process the entire body here.
