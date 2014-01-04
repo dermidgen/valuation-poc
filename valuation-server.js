@@ -21,21 +21,21 @@ app.configure(function() {
 });
 
 app.get('/propertySearch', function(req, res) {
-	var uri = "http://www.zillow.com/webservice/GetSearchResults.htm?zws-id="+zwid+
-			"&address="+req.query.address+"&citystatezip="+req.query.citystatezip;
+	var ec = encodeURIComponent;
+	var uri = "http://www.zillow.com/webservice/GetSearchResults.htm";
+	var q = "?zws-id="+ec(zwid)+"&address="+ec(req.query.address)+
+								"&citystatezip="+ec(req.query.citystatezip);
 
-	console.log(encodeURIComponent(uri));
+	var url = uri + q
+	console.log(url);
 
-	http.get("http://www.google.com/index.html", function(res) {
+	http.get(uri, function(res) {
 		console.log("Got response: " + res.statusCode);
+		console.log(res);
 	}).on('error', function(e) {
 		console.log("Got error: " + e.message);
 	});
 
-	http.get(encodeURIComponent(uri), function(res){
-		console.log(res);
-	    res.status(200).set('Content-Type', 'text/html').send('ok');
-	});
 });
 
 app.get('/propertyDetail', function(req, res) {
