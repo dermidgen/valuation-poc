@@ -38,11 +38,21 @@
 		border-top: 5px solid #fff;		
 	}
 
+	#topBrand {
+		font-family: 'News Cycle', sans-serif;
+		padding: 2em;
+		display:inline-block;
+		background-color: rgba(255,255,255,0.9); 
+		border: 5px solid #fff;
+		border-top: 0;
+		padding-top:1em;
+	}
+
 	#querywin, #result { 
 		padding: 2em; 
 		background-color: rgba(255,255,255,0.9); 
-		margin: 8em 0 0 0; 
-		border: 5px solid #fff;		
+		margin: 5em 0 0 0; 
+		border: 5px solid #fff;	
 	}
 	#result { display:none; margin: 2em 0; }
 
@@ -54,6 +64,11 @@
 	<div id="wrap">
 		<div id="main" class="container clear-top">
 
+			<div id="topBrand">
+				Offered by:<br>
+				<img src="http://solutionsbyimpact.com/images/logo.png"/>
+			</div>
+
 			<div id="querywin">
 				<form role="form">
 					<h1>What is your home worth?</h1>
@@ -61,8 +76,8 @@
 
 					<div class="row">
 						<div class="col-md-8">
-							<label class="sr-only" for="address">Enter your address</label>
-							<input type="text" name="address" id="address" placeholder="Enter your address" class="form-control"/>
+							<label class="sr-only" for="address">Enter your address, Zipcode</label>
+							<input type="text" name="address" id="address" placeholder="Enter your address, Zipcode" class="form-control"/>
 						</div>
 						<div class="col-md-3">
 							<button type="button" class="btn btn-primary" onclick="fetchProperty()">Get Valuation</button>
@@ -89,7 +104,7 @@
 	</footer>
 
 
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c&sensor=true"></script>
+<!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c&sensor=true"></script>-->
 <script language="javascript">
 
 	var gkey = 'AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c';
@@ -102,7 +117,7 @@
 			center: new google.maps.LatLng(-34.397, 150.644),
 			zoom: 8
 		};
-		var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
+		// var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
 	}
 
 	var setBG = function(data) {
@@ -114,9 +129,9 @@
 	};
 
 	var fetchProperty = function() {
-		var address = $('#address').val();
-		var zip = '92675';
-		var uri = "/propertySearch?&address="+address+"&citystatezip="+zip;
+		var address = $('#address').val().split(',');
+
+		var uri = "/propertySearch?&address="+address[0]+"&citystatezip="+address[1];
 
 		$.get(uri, function(data) {
 			var record = JSON.parse(data); 
@@ -125,7 +140,7 @@
 			$('#result').show();
 			$('#result').html(JSON.stringify(result, undefined, 2));
 
-      		google.maps.event.addDomListener(window, 'load', initialize);
+      		// google.maps.event.addDomListener(window, 'load', initialize);
 		});
 	};
 
