@@ -1,8 +1,9 @@
 var http    = require('http'),
     express = require('express'),
     app     = express(),
-    libxmljs= require('libxmljs');
+    xml2js	= require('xml2js');
 
+var parser = new xml2js.Parser();
 var zwid = 'X1-ZWz1dp4jgzyih7_axb7v';
 
 app.configure(function() {
@@ -34,22 +35,18 @@ app.get('/propertySearch', function(req, client) {
 	  // console.log('STATUS: ' + res.statusCode);
 	  // console.log('HEADERS: ' + JSON.stringify(res.headers));
 
-	  // Buffer the body entirely for processing as a whole.
 	  var bodyChunks = [];
 	  res.on('data', function(chunk) {
-	    // You can process streamed parts here...
 	    bodyChunks.push(chunk);
 	  }).on('end', function() {
 	    var body = Buffer.concat(bodyChunks);
 	    // console.log('BODY: ' + body);
 
-	    var xmlDoc = libxmljs.parseXml(body);
-	    var out = JSON.stringify(xmlDoc);
-
-	    console.log(out);
-	    client.status(200).set('Content-Type', 'text/html').send(out);
-
-	    // ...and/or process the entire body here.
+		parser.parseString(data, function (err, result) {
+		    console.dir(result);
+		    client.status(200).set('Content-Type', 'text/html').send(result);
+		    console.log('Done');
+		});
 	  })
 	});
 
