@@ -1,7 +1,9 @@
 var http    = require('http'),
+	https    = require('https'),
     express = require('express'),
     app     = express(),
     xml2js	= require('xml2js'),
+    mailtemp= require('./autoresponse.json'),
     nano	= require('nano')('http://localhost:5984');
 
 var parser = new xml2js.Parser();
@@ -24,6 +26,37 @@ var cacheProperty = function(property) {
 		}
 	})
 }
+
+var saveLead = function() {
+
+};
+
+var sendMail = function(){
+
+	console.log('sending autoresponse');
+
+	var post_data = (JSON.stringify(mailtemp));
+
+	var options = {
+		host: 'mandrillapp.com',
+		port: 443,
+		path: '/api/1.0/messages/send.json',
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+        	'Content-Length': post_data.length
+		}
+	};
+
+	var req = https.request(options, function(res){
+		res.setEncoding('utf8');
+		res.on('data', function (chunk) {
+		  console.log('Response: ' + chunk);
+		});
+	});
+	req.write(post_data);
+	req.end();
+};
 
 app.configure(function() {
 
@@ -65,6 +98,7 @@ app.get('/propertySearch', function(req, client) {
 		    cacheProperty(property);
 
 		    client.status(200).set('Content-Type', 'text/html').send(result);
+		    sendMail();
 		    console.log('Done');
 		});
 	  })
