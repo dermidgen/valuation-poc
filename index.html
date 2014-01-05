@@ -28,6 +28,7 @@
 	#wrap { min-height: 100%; }
 	#main { overflow:auto; padding-bottom: 60px; }
 	.footer { 
+		display: none;
 		font-size: 0.8em;
 		position: relative;
 		margin-top: -60px;
@@ -156,7 +157,7 @@
 		};
 		gmap = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
 		gmap.setCenter(ltlg);
-		gmap.setZoom(17);
+		gmap.setZoom(18);
 
 		var marker = new google.maps.Marker({
 			position: ltlg,
@@ -211,6 +212,7 @@
 			var widgetRegion = encodeURIComponent(city);
 
 			$('#result').show();
+			$('.footer').show();
 			showWidgets(widgetAddress, widgetRegion);
 			setMap({
 				street: street,
