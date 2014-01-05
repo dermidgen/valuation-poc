@@ -76,8 +76,8 @@
 
 					<div class="row">
 						<div class="col-md-8">
-							<label class="sr-only" for="address">Enter your address, Zipcode</label>
-							<input type="text" name="address" id="address" placeholder="Enter your address, Zipcode" class="form-control"/>
+							<label class="sr-only" for="address">Enter your address</label>
+							<input type="text" name="address" id="address" placeholder="Enter your address" class="form-control"/>
 						</div>
 						<div class="col-md-3">
 							<button type="button" class="btn btn-primary" onclick="fetchProperty()">Get Valuation</button>
@@ -95,11 +95,7 @@
 						<input value="f7f5f4" id="skinnyCalcBgc" type="hidden"></input>
 
 						<div>
-							<div class="title">Home Value Estimate</div>
 							<div id="zillow-shv-js-large-widget1388867792035"></div>
-							<!-- <div id="footer-links-container" style="height:auto;padding-bottom:5px;margin:5px 5px 0;text-align:center;">
-								<div style="height:auto;display:block;overflow:hidden;"><a href="http://www.zillow.com/san-juan-capistrano-ca/" target="_blank" style="font-size:11px;padding:0;width:285px;color:#736c5f;text-decoration:none;" scen="s1"><span class="region">San Juan Capistrano</span> on Zillow</a></div>
-							</div> -->
 						</div>
 					</div>
 					<div class="col-md-8">
@@ -130,6 +126,7 @@
 <script type="text/javascript" language="javascript">
 
 	var gkey = 'AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c';
+	var gmap;
 
 	// var uri = "http://api.flickr.com/services/feeds/photos_public.gne?tags=house,street,yard&format=json&lang=en-us&jsoncallback=?";
 	var uri = "http://api.flickr.com/services/feeds/groups_pool.gne?id=92575895@N00&format=json&lang=en-us&jsoncallback=?";
@@ -148,12 +145,40 @@
 	}
 
 	function initialize() {
-		var mapOptions = {
-			center: new google.maps.LatLng(-34.397, 150.644),
-			zoom: 8
-		};
-		var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
 	}
+
+	var setMap = function(property) {
+		var ltlg = new google.maps.LatLng(property.lat,property.lng);
+		var mapOptions = {
+			center: ltlg,
+			zoom: 17,
+			mapTypeId: google.maps.MapTypeId.SATELLITE
+		};
+		gmap = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
+		gmap.setCenter(ltlg);
+		gmap.setZoom(17);
+
+		var marker = new google.maps.Marker({
+			position: ltlg,
+			map: gmap,
+			title: 'My House'
+		});
+
+		var content = '<strong>' + property.street + ', ' + property.city + ', ' + property.state + ' ' + property.zip + '</strong><br>' +
+					'Zestimate &copy;: ' + property.zestimate;
+
+
+		var infowindow = new google.maps.InfoWindow({
+			content: content
+		});
+
+		infowindow.open(gmap,marker);
+
+		google.maps.event.addListener(marker, 'click', function() {
+			infowindow.open(gmap,marker);
+		});
+
+	};
 
 	var setBG = function(data) {
 		var l = data.items.length;
@@ -176,13 +201,26 @@
 			var city = result.address[0].city[0];
 			var state = result.address[0].state[0]
 			var zip = result.address[0].zipcode[0];
+			var lat = result.address[0].latitude[0];
+			var lng = result.address[0].longitude[0];
+
+			var zestimate = result.zestimate[0].amount[0]._;
+			console.log(zestimate);
 
 			var widgetAddress = encodeURIComponent(street + ',' + zip);
 			var widgetRegion = encodeURIComponent(city);
 
 			$('#result').show();
 			showWidgets(widgetAddress, widgetRegion);
-			initialize();
+			setMap({
+				street: street,
+				city: city,
+				state: state,
+				zip: zip,
+				lat: lat,
+				lng: lng,
+				zestimate: zestimate
+			});
 			// $('#result').html(JSON.stringify(result, undefined, 2));
 
       		// google.maps.event.addDomListener(window, 'load', initialize);

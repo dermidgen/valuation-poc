@@ -1,10 +1,29 @@
 var http    = require('http'),
     express = require('express'),
     app     = express(),
-    xml2js	= require('xml2js');
+    xml2js	= require('xml2js'),
+    nano	= require('nano')('http://localhost:5984');
 
 var parser = new xml2js.Parser();
 var zwid = 'X1-ZWz1dp4jgzyih7_axb7v';
+
+var properties = nano.use('properties');
+
+var cacheProperty = function(property) {
+	console.log('caching property',property.zpid);
+	properties.get(property.zpid[0], function(err, body){
+		if (err) {
+			console.log('creating new property record')
+			properties.insert(property, property.zpid[0], function(err, body){
+				if (!err) console.log('property cached');
+				else console.log('error caching property');
+			});
+		} else {
+			console.log('property exists');
+			// TODO: update property
+		}
+	})
+}
 
 app.configure(function() {
 
@@ -40,10 +59,11 @@ app.get('/propertySearch', function(req, client) {
 	    bodyChunks.push(chunk);
 	  }).on('end', function() {
 	    var body = Buffer.concat(bodyChunks);
-	    // console.log('BODY: ' + body);
-
 		parser.parseString(body, function (err, result) {
-		    console.dir(result);
+		    // console.dir(result);
+		    var property = result["SearchResults:searchresults"].response[0].results[0].result[0]
+		    cacheProperty(property);
+
 		    client.status(200).set('Content-Type', 'text/html').send(result);
 		    console.log('Done');
 		});
