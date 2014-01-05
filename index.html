@@ -300,11 +300,11 @@
 			var zlink = result.links[0].homedetails[0];
 			var yearbuilt = result.yearBuilt[0];
 			var bedrooms = result.bedrooms[0];
-			var bathrooms = result.bathrooms[0];
+			var bathrooms = (result.bathrooms) ? result.bathrooms[0] : 0;
 			var lastSoldDate = result.lastSoldDate[0];
 			var lastSoldPrice = result.lastSoldPrice[0]._;
-			var lotSizeSqFt = result.lotSizeSqFt[0];
-			var sqFt = result.finishedSqFt[0];
+			var lotSizeSqFt = (result.lotSizeSqFt) ? result.lotSizeSqFt[0] : 0;
+			var sqFt = (result.finishedSqFt) ? result.finishedSqFt[0] : 0;
 			var useCode = result.useCode[0];
 
 			var sDate = new Date(lastSoldDate);
