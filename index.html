@@ -234,27 +234,33 @@
 		var invalid = function(field) {
 			$('#'+field).parent().addClass('has-error');
 		}
+
 		if (!firstname) invalid('firstname');
 		if (!lastname) invalid('lastname');
 		if (!email) invalid('email');
-
 		if (!firstname || !lastname || !email) {
 			return false;
 		}
 
-		$('#capture').modal('hide');
+		var lead = {
+			firstname: firstname,
+			lastname: lastname,
+			email: email
+		}
 
-		fetchProperty(function(property){
+		fetchProperty(lead, function(property){
 			ga('send', 'pageview', '/estimate?id='+property.zpid);
 		});
+
+		$('#capture').modal('hide');
 	};
 
-	var fetchProperty = function(cb) {
+	var fetchProperty = function(lead, cb) {
 		var address = $('#address').val().split(',');
 
 		var uri = "/propertySearch?&address="+address.shift()+"&citystatezip="+address.join(',');
 
-		$.get(uri, function(data) {
+		$.post(uri, lead, function(data) {
 			var record = JSON.parse(data); 
 			var result = record["SearchResults:searchresults"].response[0].results[0].result[0];
 

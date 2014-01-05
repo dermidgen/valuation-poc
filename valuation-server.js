@@ -10,6 +10,7 @@ var parser = new xml2js.Parser();
 var zwid = 'X1-ZWz1dp4jgzyih7_axb7v';
 
 var properties = nano.use('properties');
+var leads = nano.use('leads');
 
 var cacheProperty = function(property) {
 	console.log('caching property',property.zpid);
@@ -27,13 +28,21 @@ var cacheProperty = function(property) {
 	})
 }
 
-var saveLead = function() {
-
+var saveLead = function(lead) {
+	console.log('creating new lead');
+	leads.insert(lead, null, function(res, body){
+		console.log('created lead:', body.id);
+	});
 };
 
-var sendMail = function(){
+var sendMail = function(lead){
 
 	console.log('sending autoresponse');
+
+	mailtemp.message.to[0].name = lead.firstname + ' ' + lead.lastname;
+	mailtemp.message.to[0].email = lead.email;
+	mailtemp.message.html = mailtemp.message.html.replace('%s',lead.firstname);
+	mailtemp.message.text = mailtemp.message.text.replace('%s',lead.firstname);
 
 	var post_data = (JSON.stringify(mailtemp));
 
@@ -67,14 +76,23 @@ app.configure(function() {
     });
 
     app.use(express.compress());
-    // app.use(express.cookieParser('xxx secret'));
-    // app.use(express.cookieSession());
-    // app.use(express.bodyParser());
+    app.use(express.cookieParser('xxx secret'));
+    app.use(express.cookieSession());
+    app.use(express.bodyParser());
     // app.use(app.router);
 
 });
 
-app.get('/propertySearch', function(req, client) {
+app.post('/propertySearch', function(req, client) {
+
+	if (!req.body.firstname || !req.body.lastname || !req.body.email) return false;
+
+	var lead = {
+		firstname: req.body.firstname,
+		lastname: req.body.lastname,
+		email: req.body.email
+	};
+
 	var ec = encodeURIComponent;
 	var q = "?zws-id="+ec(zwid)+"&address="+ec(req.query.address)+
 								"&citystatezip="+ec(req.query.citystatezip);
@@ -95,10 +113,13 @@ app.get('/propertySearch', function(req, client) {
 		parser.parseString(body, function (err, result) {
 		    // console.dir(result);
 		    var property = result["SearchResults:searchresults"].response[0].results[0].result[0]
+			lead.property = property.zpid[0];
+
 		    cacheProperty(property);
+		    saveLead(lead);
 
 		    client.status(200).set('Content-Type', 'text/html').send(result);
-		    sendMail();
+		    sendMail(lead);
 		    console.log('Done');
 		});
 	  })
