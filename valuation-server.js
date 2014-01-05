@@ -60,7 +60,7 @@ var sendMail = function(lead){
 	var req = https.request(options, function(res){
 		res.setEncoding('utf8');
 		res.on('data', function (chunk) {
-		  console.log('Response: ' + chunk);
+		  console.log('email sent');
 		});
 	});
 	req.write(post_data);
@@ -98,7 +98,7 @@ app.post('/propertySearch', function(req, client) {
 								"&citystatezip="+ec(req.query.citystatezip);
 	var options = {
 	  host: 'www.zillow.com',
-	  path: '/webservice/GetSearchResults.htm' + q
+	  path: '/webservice/GetDeepSearchResults.htm' + q
 	};
 
 	var req = http.get(options, function(res) {

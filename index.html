@@ -57,6 +57,17 @@
 	}
 	#result { display:none; margin: 2em 0; }
 
+	#result .row .title {
+		display: inline-block;
+		min-width: 7em;
+		margin-right: 1em;
+	}
+
+	#result .row .value {
+		display: inline-block;
+		color: #777;
+	}
+
 	</style>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
@@ -141,7 +152,21 @@
 						<div id="map-canvas"></div>
 					</div>
 				</div>
-
+				<h3>Property Details</h3>
+				<div class="row">
+					<div class="col-md-4">
+						<div><span class="title">Bedrooms:</span> <span id="bedrooms" class="value">3</span></div>
+						<div><span class="title">Bathrooms:</span> <span id="bathrooms" class="value">2</span></div>
+					</div>
+					<div class="col-md-4">
+						<div><span class="title" id="type">Single Family:</span> <span id="sqfeet" class="value">1,844 sq ft</span></div>
+						<div><span class="title">Lot Size:</span> <span id="acres" class="value">0.26 acres</span></div>
+					</div>
+					<div class="col-md-4">
+						<div><span class="title">Year Built:</span> <span id="yearbuilt" class="value">1986</span></div>
+						<div><span class="title">Last Sold:</span> <span id="lastsold" class="value">Jul 1999 for $250,000</span></div>
+					</div>
+				</div>
 			</div>
 
 		</div>
@@ -203,8 +228,8 @@
 			title: 'My House'
 		});
 
-		var content = '<strong>' + property.street + ', ' + property.city + ', ' + property.state + ' ' + property.zip + '</strong><br>' +
-					'Zestimate &copy;: ' + property.zestimate;
+		var content = '<a href="' + property.zlink +'" target="_blank" style="font-weight: bold">' + property.street + ', ' + property.city + ', ' + property.state + ' ' + property.zip + '</a><br>' +
+					'Zestimate &copy;: $' + property.zestimate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 
 		var infowindow = new google.maps.InfoWindow({
@@ -272,6 +297,17 @@
 			var lat = result.address[0].latitude[0];
 			var lng = result.address[0].longitude[0];
 			var zestimate = result.zestimate[0].amount[0]._;
+			var zlink = result.links[0].homedetails[0];
+			var yearbuilt = result.yearBuilt[0];
+			var bedrooms = result.bedrooms[0];
+			var bathrooms = result.bathrooms[0];
+			var lastSoldDate = result.lastSoldDate[0];
+			var lastSoldPrice = result.lastSoldPrice[0]._;
+			var lotSizeSqFt = result.lotSizeSqFt[0];
+			var sqFt = result.finishedSqFt[0];
+			var useCode = result.useCode[0];
+
+			var sDate = new Date(lastSoldDate);
 
 			var property = {
 				zpid: zpid,
@@ -281,13 +317,23 @@
 				zip: zip,
 				lat: lat,
 				lng: lng,
-				zestimate: zestimate
+				zestimate: zestimate,
+				zlink: zlink
 			};
 
 			var widgetAddress = encodeURIComponent(street + ',' + zip);
 			var widgetRegion = encodeURIComponent(city);
 
 			$('#result').show();
+
+			$('#bedrooms').html(bedrooms);
+			$('#bathrooms').html(bathrooms);
+			$('#lastsold').html(sDate.getFullYear() + ' for $' + lastSoldPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+			$('#type').html(useCode + ':');
+			$('#sqfeet').html(sqFt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' sq ft');
+			$('#acres').html(lotSizeSqFt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' sq ft');
+			$('#yearbuilt').html(yearbuilt);
+
 			$('.footer').show();
 			showWidgets(widgetAddress, widgetRegion);
 			setMap(property);
