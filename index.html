@@ -93,7 +93,7 @@
 							<input type="text" name="address" id="address" placeholder="Enter your address" class="form-control"/>
 						</div>
 						<div class="col-md-3">
-							<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#capture">Search</button>
+							<button type="button" class="btn btn-primary" data-target="#capture" onclick="register()">Search</button>
 						</div>
 					</div>
 				</form>
@@ -191,6 +191,7 @@
 
 	var gkey = 'AIzaSyBrDWIgR2ivRJuGHHpLly88P697sDi5S3c';
 	var gmap;
+	var pageLead = null;
 
 	// var uri = "http://api.flickr.com/services/feeds/photos_public.gne?tags=house,street,yard&format=json&lang=en-us&jsoncallback=?";
 	var uri = "http://api.flickr.com/services/feeds/groups_pool.gne?id=92575895@N00&format=json&lang=en-us&jsoncallback=?";
@@ -252,28 +253,41 @@
 		}
 	};
 
+	var register = function() {
+		if (pageLead) leadCapture();
+		if (!pageLead) $('#capture').modal('show');
+	}
+
 	var leadCapture = function() {
-		var firstname = $('#firstname').val();
-		var lastname = $('#lastname').val();
-		var email = $('#email').val();
-		var invalid = function(field) {
-			$('#'+field).parent().addClass('has-error');
-		}
 
-		if (!firstname) invalid('firstname');
-		if (!lastname) invalid('lastname');
-		if (!email) invalid('email');
-		if (!firstname || !lastname || !email) {
-			return false;
-		}
+		if (!pageLead) {
+			var firstname = $('#firstname').val();
+			var lastname = $('#lastname').val();
+			var email = $('#email').val();
+			var invalid = function(field) {
+				$('#'+field).parent().addClass('has-error');
+			}
 
-		var lead = {
-			firstname: firstname,
-			lastname: lastname,
-			email: email
-		}
+			if (!firstname) invalid('firstname');
+			if (!lastname) invalid('lastname');
+			if (!email) invalid('email');
+			if (!firstname || !lastname || !email) {
+				return false;
+			}
+
+			var lead = {
+				firstname: firstname,
+				lastname: lastname,
+				email: email,
+				isnew: true
+			}
+		} else lead = pageLead;
 
 		fetchProperty(lead, function(property){
+			if (!pageLead) {
+				pageLead = lead;
+				pageLead.isnew = false;
+			}
 			ga('send', 'pageview', '/estimate?id='+property.zpid);
 		});
 

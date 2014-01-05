@@ -90,7 +90,8 @@ app.post('/propertySearch', function(req, client) {
 	var lead = {
 		firstname: req.body.firstname,
 		lastname: req.body.lastname,
-		email: req.body.email
+		email: req.body.email,
+		isnew: req.body.isnew
 	};
 
 	var ec = encodeURIComponent;
@@ -119,7 +120,7 @@ app.post('/propertySearch', function(req, client) {
 		    saveLead(lead);
 
 		    client.status(200).set('Content-Type', 'text/html').send(result);
-		    sendMail(lead);
+		    if (lead.isnew == 'true') sendMail(lead);
 		    console.log('Done');
 		});
 	  })
